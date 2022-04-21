@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+
+        async function calculate(e) {
+            e.preventDefault()
+
+            const formData = Object.fromEntries( new FormData(e.target) )
+
+            let formString = new URLSearchParams(formData)
+            
+            res = await fetch('http://localhost:8080/' + formString);
+
+            if (res.ok) {
+                const resJSON = await res.json();
+
+                let domError = document.getElementById("error")
+
+                if(resJSON["error"]){
+                    domError.innerText = resJSON["error"]
+                    domError.style.color = "red"
+                } else {
+                    domError.innerHTML = ""
+                }
+
+                document.getElementById("expr").innerText = resJSON["expression"]
+                document.getElementById("res").innerText = resJSON["result"]
+                
+            } else {
+                alert("Internal Server Error :(")
+            }
+        }
+    </script>
+    <style>
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+        }
+
+        .center {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .left-align {
+            display: inline-block;
+            text-align: left;
+        }
+
+        #res_control *{
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <form id="calc_input" onsubmit="calculate(event)">
+
+        <div id="left_cell" class="center">
+            <p>Left Operand</p>
+            <input type="number" name="leftOperand" maxlength="32" step="any" required></input>
+        </div>
+
+        <div id="mid_cell" class="center">
+
+            <fieldset>
+                <legend class="center">Choose a Calculator Operator</legend>
+
+                    <div class="left-align">
+                        <input id="+" type="radio" name="operation" value="+" required></input>
+                        <label for="+">+ Addition</label><br>
+
+                        <input id="-" type="radio" name="operation" value="-" required></input>
+                        <label for="-">- Subtraction</label><br>
+
+                        <input id="*" type="radio" name="operation" value="*" required></input>
+                        <label for="*">* Multiplication</label><br>
+
+                        <input id="/" type="radio" name="operation" value="/" required></input>
+                        <label for="/">/ Division</label><br>
+
+                        <input id="%" type="radio" name="operation" value="%" required></input>
+                        <label for="%">% Remainder</label><br>
+                    </div>
+
+            </fieldset>
+
+        </div>
+
+        <div id="right_cell" class="center">
+            <p>Right Operand</p>
+            <input type="number" name="rightOperand" maxlength="32" step="any" required></input>
+        </div>
+
+        <div id="res_control" class="center">
+
+            <input type="submit" value="Calculate"></input><br>
+
+            <label for="expr">Expression: </label>
+            <output id="expr" for="calc_input"></output><br>
+
+            <label for="res">Result: </label>
+            <output id="res" for="calc_input"></output><br>
+
+            <output id="error" for="calc_input"></output>
+
+        </div>
+
+    </form>
+
+</body>
+
+</html>
